@@ -1,0 +1,25 @@
+django
+gunicorn
+requests
+djangorestframework
+django-rest-swagger
+django-filter
+
+## dev requirements
+sphinx
+sphinx_rtd_theme
+mock
+responses
+ipdb
+ipython
+
+## Test and quality analysis
+
+pylint
+coverage
+django-jenkins
+django-extensions
+django-cors-headers
+
+## custom libs:
+tangent-tokenauth

@@ -1,5 +1,8 @@
 from django.utils import timezone
 from django.db import models
+from django.contrib.auth.models import User
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 import datetime
 # Create your models here.
@@ -56,13 +59,40 @@ class Fixture(models.Model):
     class Meta:
         ordering = ('matchday',)
 
+class Person(models.Model):
+    #userid = models.CharField(max_length=100)
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    bio = models.TextField(max_length=500, blank=True)
+    location = models.CharField(max_length=30, blank=True)
+    birth_date = models.DateField(null=True, blank=True)
+    #communities = models.ManyToManyField(Community)
+    #isadmin = models.BooleanField()
 
-class Community(models.Model):
+    def __str__(self):
+        return self.email
+        
+    class Meta:
+        ordering = ('user',)
+        
+@receiver(post_save, sender=User)
+def create_user_person(sender, instance, created, **kwargs):
+    if created:
+        Person.objects.create(user=instance)
+
+@receiver(post_save, sender=User)
+def save_user_person(sender, instance, **kwargs):
+    instance.person.save()
+
+	
+class Group(models.Model):
     name = models.CharField(max_length=300)
     description = models.CharField(max_length=300)
+    members = models.ManyToManyField(Person, through='Membership')
     createddate = models.DateTimeField(auto_now=True)
     lastmodified = models.DateTimeField(auto_now=True)
     # avatar = models.CharField(max_length=300)
+    ispublic = models.BooleanField(default=True)
+    fixtures = models.ManyToManyField(Fixture)
 
     def __str__(self):
         return self.name
@@ -70,16 +100,29 @@ class Community(models.Model):
     class Meta:
         ordering = ('name',)
 
-
-class Member(models.Model):
-    #userid = models.CharField(max_length=100)
-    firstname = models.CharField(max_length=100)
-    lastname = models.CharField(max_length=100)
-    email =  models.EmailField()
-    password = models.CharField(max_length=100)
-    communities = models.ManyToManyField(Community)
+    
+class Membership(models.Model):
+    person = models.ForeignKey(Person, on_delete=models.CASCADE)
+    group = models.ForeignKey(Group, on_delete=models.CASCADE)
+    date_joined = models.DateField()
+    invite_reason = models.CharField(max_length=64)
     isadmin = models.BooleanField()
-
+    
     def __str__(self):
-        return self.email
+       return self.group.name
+       
+    class Meta:
+        ordering = ('date_joined',)
+    
+# class GroupFixtures(models.Model):
+    # fixtures = models.ForeignKey(Fixture, on_delete=models.CASCADE)
+    # group = models.ForeignKey(Group, on_delete=models.CASCADE)
 
+class Prediction(models.Model):
+   memberships = models.ForeignKey(Membership, on_delete=models.CASCADE)
+   fixtures = models.ForeignKey(Fixture, on_delete=models.CASCADE)
+   awayteamgoals = models.IntegerField(default=0)
+   hometeamgoals = models.IntegerField(default=0)
+   iscorrect = models.BooleanField(default=null)
+   createddate = models.DateTimeField(auto_now=True)
+   lastmodified = models.DateTimeField(auto_now=True)
