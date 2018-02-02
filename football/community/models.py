@@ -123,6 +123,6 @@ class Prediction(models.Model):
    fixtures = models.ForeignKey(Fixture, on_delete=models.CASCADE)
    awayteamgoals = models.IntegerField(default=0)
    hometeamgoals = models.IntegerField(default=0)
-   iscorrect = models.BooleanField(default=null)
+   iscorrect = models.BooleanField(default=False)
    createddate = models.DateTimeField(auto_now=True)
    lastmodified = models.DateTimeField(auto_now=True)
