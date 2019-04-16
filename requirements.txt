@@ -26,3 +26,5 @@ tangent-tokenauth
 
 ## Database
 psycopg2-binary
+
+python-decouple
