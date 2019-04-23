@@ -1,17 +1,15 @@
 from django.conf import settings
-import http.client
 import json
 import requests
 from .serializers import CompetitionSerializer, GameSerializer
-from datetime import datetime
 
 url = settings.FOOTBALL_DATA_URL
 
 
 class FootballData:
-
-    def get_competitions(self):
-        endpoint = url + '/v1/competitions'
+    @staticmethod
+    def get_competitions():
+        endpoint = url + '/v2/competitions'
         headers = {'X-Auth-Token': settings.FOOTBALL_KEY, 'X-Response-Control': 'minified'}
         response = requests.get(endpoint, headers=headers)
         payload = None
@@ -25,8 +23,10 @@ class FootballData:
                     serializer.save()
         return
 
-    def get_games(self, comp):
-        endpoint = url + '/v1/competitions/' + comp + '/fixtures'
+    @staticmethod
+    def get_games(comp):
+        endpoint = url + '/v2/competitions/' + comp + '/fixtures'
+        print(endpoint)
         headers = {'X-Auth-Token': settings.FOOTBALL_KEY, 'X-Response-Control': 'minified'}
         response = requests.get(endpoint, headers=headers)
         payload = None
@@ -40,5 +40,5 @@ class FootballData:
 
                 serializer = GameSerializer(data=des)
                 if serializer.is_valid():
-                    serializer..save()
+                    serializer.save()
         return
