@@ -20,11 +20,13 @@ coverage
 django-jenkins
 django-extensions
 django-cors-headers
+django_postgres_extensions
 
 ## custom libs:
 tangent-tokenauth
 
 ## Database
 psycopg2-binary
+
 
 python-decouple
